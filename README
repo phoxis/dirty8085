@@ -1,0 +1,95 @@
+----------------VERSION UPDATES-----------------
+v0.2.1
+
+UPDATES:
+[1] step over execution added
+[2] displays the next instruction to be processed
+    and the current instruction processed in step
+    execution mode
+[3] ral, rar, rlc, rrc instructions fixed
+[4] some other bugs fixed
+[5] Menus update
+
+
+NOTES:
+[1] All the instructions are not yes testes and checked. 
+    please let us know about the bugs
+
+-----------------INSTALL------------------------
+[1] Extract contents and enter into the extracted directory
+[2] Spawn a shell in the directory
+[3] Execute   
+      `make`
+[4] Execute as super user
+      `make install`
+[5] to run From terminal execute
+      `dirty`
+
+To remove run `make remove` as super user
+To run without installing after executing `make` run the binary 'dirty' created
+
+
+------------------USAGE-------------------------
+
+
+Memory Up                    :  Up key , Enter Key
+Memory Down                  :  Down key, Backspace
+Memory Jump 16 places Up     :  Page Up
+Memory Jump 16 places Down   :  Page Down
+Goto Memory Location         :  g  , F3
+Set Start Address            :  s
+Start Execution              :  x  , F5
+Step Execution               :  z  , F7
+Step Over                    :       F8 
+End Step Execution           :  q
+Read machine state from file :       F9
+Write machine state to file  :       F6
+Reset Flags and Registers    :  r
+Help                         :  h  , F1
+Quit                         :  ESC, F12
+
+Use 0-9 and a-f to enter values at address
+
+To execute a code first set the start address by pressing 's' and providing the start address.
+If you have used the step execution method and you want to stop it press 'q' to reset the step executiond
+Step over would jump over an instruction without executing it.
+
+To test the functionality a test file is provided "dirty_test"
+load "dirty_test" in the application by pressing F9 and then 
+entering the full file path and press enter. The file has three 
+8085 codes loaded as described below:
+
+Bubble Sort
+Program loaded at          : 4200h
+Program input data set at  : 0000h
+                                        contains the number of elements in the list (set to 0ah)
+                                        and then the elements of the list follows
+Program output data set at : 07d0h
+                                        Contains the sorted list sequence of the list at 0000h
+
+
+
+Count Number of 1s in a byte
+
+Program loaded at          : 4300h
+Program input data at      : 0100h
+                                        Contains the input byte, of which number of 1s should be counted
+Program output data at     : 0101h
+                                        Contains the number of 1s in the byte stored in 0100h location
+
+
+
+Find the GCD of two numbers
+
+Program loaded at          : 4400h
+Program input data set     : 0200h , 0201h
+                                        these location contains the two number of which the GCD is to be found
+Program output data        : 0202h
+                                        contains the GCD of the two numbers stored in 0200h and 0201h
+
+
+
+
+--------------------- AUTHOR ----------------------
+Author  : Arjun Pakrashi
+Website : http://phoxis.org
