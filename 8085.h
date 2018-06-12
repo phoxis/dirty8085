@@ -70,7 +70,7 @@ struct _instruction_set {
 
 typedef struct __8085_machine_t {
   /* Registers */
-  u16int_t a;        
+  u16int_t a;
   u8int_t flag;
   u8int_t b;
   u8int_t c;
@@ -80,6 +80,9 @@ typedef struct __8085_machine_t {
   u8int_t l;
   u16int_t sp;
   u16int_t pc;
+  
+  /* Last copy of register A previous state */
+  u16int_t a_last;
 
   /* Memory */
   u8int_t memory[MAX_MEM];

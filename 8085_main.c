@@ -35,8 +35,8 @@
  * outside this file.
  * [8]we can connect some of the io ports to the stdin and stdout files, or other files for io, think later
  * [9] messy code, unstructured data, plan and structre it .
- * [**10] update the auxiliary carry flag properly. think how it should be detected
- * [**11] DAA: if carry is 1 then do not modyfy, else if 0 then modify 
+ * [10] update the auxiliary carry flag properly. think how it should be detected [TESTING]
+ * [**11] DAA: if carry is 1 then do not modify, else if 0 then modify 
  * [**12] add the undocumented instructions
  */
 /*
@@ -142,9 +142,13 @@ static void tm_update_flags (u8int_t s, u8int_t z, u8int_t ac, u8int_t p, u8int_
   {
     case UPDATE_SIGN:
       if ((tm->a & 0x80) == 0x80)
-	tm_set_sign ();
+      {
+        tm_set_sign ();
+      }
       else
-	tm_clear_sign ();
+      {
+        tm_clear_sign ();
+      }
       break;
     
     case NO_CHANGE_SIGN:
@@ -163,9 +167,13 @@ static void tm_update_flags (u8int_t s, u8int_t z, u8int_t ac, u8int_t p, u8int_
   {
     case UPDATE_ZERO:
       if (tm->a == 0)
-	tm_set_zero ();
+      {
+        tm_set_zero ();
+      }
       else
-	tm_clear_zero ();
+      {
+        tm_clear_zero ();
+      }
       break;
     
     case NO_CHANGE_ZERO:
@@ -183,7 +191,34 @@ static void tm_update_flags (u8int_t s, u8int_t z, u8int_t ac, u8int_t p, u8int_
   switch (ac)
   {
     case UPDATE_AUXCARRY:
-      //TODO
+    {
+      u8int_t temp_a      = tm->a & 0xff;
+      u8int_t temp_a_last = tm->a_last & 0xff;
+      u8int_t mask_a = 0x80;
+      u8int_t mask_a_last = 0x80;
+      
+      // WARNING: Need to fully validate if this change does cover all the cases for setting the AC flag
+      // If the highest bit in a and a_last has changed, and one of the a or a_last have the highest 1 at more than bit 3, then AC is set
+      while (mask_a & temp_a)
+      {
+        mask_a >>= 1;
+      }
+      
+      while (mask_a_last & temp_a_last)
+      {
+        mask_a_last >>= 1;
+      }
+      
+      // If the 4th bit is on, then AC
+      if (((mask_a != mask_a_last) && (mask_a > 0x08 || mask_a_last > 0x08)) || (((temp_a & 0x10) == 1) && ((temp_a_last & 0x10) == 0)))
+      {
+        tm_set_auxcarry ();
+      }
+      else
+      {
+        tm_clear_auxcarry ();
+      }
+    }
       break;
 
     case NO_CHANGE_AUXCARRY:
@@ -201,23 +236,23 @@ static void tm_update_flags (u8int_t s, u8int_t z, u8int_t ac, u8int_t p, u8int_
   switch (p)
   {
     case UPDATE_PARITY:
+    {
+      u8int_t temp = tm->a;
+      _Bool parity = 1;
+    // 	  temp = a;
+    // 	  parity = 1;
+      //using loop, leaving optimizationon compiler
+      //else write 8 sparate lines each one checking for each bit 
+      //for faster execution (avoid shifting), as in hardware (parallal)
+      while (temp)
       {
-	u8int_t temp = tm->a;
-	_Bool parity = 1;
-// 	  temp = a;
-// 	  parity = 1;
-	//using loop, leaving optimizationon compiler
-	//else write 8 sparate lines each one checking for each bit 
-	//for faster execution (avoid shifting), as in hardware (parallal)
-	while (temp)
-	{
-	  if (temp & 0x01)
-	    parity = !parity;
-	  temp >>= 1;
-	}
-	parity == 1 ? tm_set_parity () : tm_clear_parity ();
-      } 
-      break;
+        if (temp & 0x01)
+          parity = !parity;
+        temp >>= 1;
+      }
+      parity == 1 ? tm_set_parity () : tm_clear_parity ();
+    } 
+    break;
     
     case NO_CHANGE_PARITY:
       break;
@@ -235,9 +270,13 @@ static void tm_update_flags (u8int_t s, u8int_t z, u8int_t ac, u8int_t p, u8int_
   {
     case UPDATE_CARRY:
       if ((tm->a & 0xff00) != 0)
-	tm_set_carry ();
+      {
+        tm_set_carry ();
+      }
       else
-	tm_clear_carry ();
+      {
+        tm_clear_carry ();
+      }
       // Clear the upper byte of a
       tm->a &= 0xff;
       break;
@@ -846,6 +885,11 @@ static struct _instruction_set *tm_fetch_instruction (void)
   u8int_t opcode;
   u16int_t mem_operand_low, mem_operand_hi;
   u8int_t mem_operand_size;
+  
+  
+  // Store the old state of register A
+  // NOTE: This is to be used with updating the auxiliary carry flag. Quick workaround May not belong here
+  tm->a_last = tm->a;
   
   program_counter = tm->pc;
   opcode = tm->memory[program_counter++];
@@ -3748,7 +3792,6 @@ u8int_t execute (u16int_t start_addr)
     retval = tm_execute_instruction ();
     
 //     printf ("\n[%04x] : [%02x %5s]\t%-4s %4s, %6s", tm->prev_pc, opcode, get_current_operand_2 (), get_current_opcode_str (), get_current_operand_1 (), get_current_operand_2 ());
-    
 //     printf ("\t\t{s: %d\tz: %d\tac: %d\tp: %d\tcy: %d}", tm_get_sign (), tm_get_zero (), tm_get_auxcarry (), tm_get_parity (), tm_get_carry ());
     
   } while ((retval != EXECUTE_END) && (retval != EXECUTE_ERR));
