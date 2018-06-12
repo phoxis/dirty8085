@@ -1,7 +1,7 @@
 For an overview and examples, visit: https://phoxis.org/2017/10/29/dirty8085-an-intel-8085-microprocessor-simulator/
 
 ----------------VERSION UPDATES-----------------
-v0.2.1
+v0.2.2
 
 UPDATES:
 [1] step over execution added
@@ -11,7 +11,7 @@ UPDATES:
 [3] ral, rar, rlc, rrc instructions fixed
 [4] some other bugs fixed
 [5] Menus update
-
+[6] Auxiliary flag operation fixed
 
 NOTES:
 [1] All the instructions are not yes testes and checked. 
